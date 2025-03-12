@@ -25,15 +25,16 @@ export default function LoginOtpScreen({ navigation }) {
   const verificationCode = code.join('');
   console.log('Verification Code:', verificationCode);
 
-  const token = await AsyncStorage.getItem('login_token');
-  console.log('login token', token);
+  // Retrieve the phone number from AsyncStorage
+  const mobile = await AsyncStorage.getItem('phoneNumber');
+  console.log('Phone Number:', mobile);
 
-  if (token) {
+  if (mobile) {
    try {
     const requestBody = {
-     function: 'VerifyOtp',
+     function: 'VerifyLoginOtp',
      data: {
-      token: token,
+      mobile: mobile,
       otp: verificationCode,
      },
     };
@@ -54,6 +55,7 @@ export default function LoginOtpScreen({ navigation }) {
     }
 
     const result = await response.json();
+    console.log('Response from API:', result);
 
     if (result.status === 'success') {
      // Show success modal and navigate to Home after clicking OK
@@ -70,8 +72,8 @@ export default function LoginOtpScreen({ navigation }) {
     setModalVisible(true);
    }
   } else {
-   // No token available
-   setModalMessage('Token not found. Please login again.');
+   // No token or mobile available
+   setModalMessage('Token or mobile number not found. Please login again.');
    setModalVisible(true);
   }
  };
