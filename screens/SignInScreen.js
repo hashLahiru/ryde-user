@@ -67,7 +67,7 @@ export default function SignInScreen({ navigation }) {
    <View style={styles.header}>
     <Text style={styles.title}>Welcome back!</Text>
     <Text style={styles.subtitle}>
-     Lorem ipsum dolor sit amet consectetur. Ac ipsum risus quis donec vitae.
+    Ready to hit the road? Book a ride in just a few taps!
     </Text>
    </View>
 

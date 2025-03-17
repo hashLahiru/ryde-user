@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
  View,
  Text,
@@ -11,21 +11,37 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginOtpScreen({ navigation }) {
- const [code, setCode] = useState(['', '', '', '', '', '']); // Store individual code digits for 6 fields
- const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
- const [modalMessage, setModalMessage] = useState(''); // State for dynamic modal message
+ const [code, setCode] = useState(['', '', '', '']); // Only 4-digit OTP
+ const [modalVisible, setModalVisible] = useState(false);
+ const [modalMessage, setModalMessage] = useState('');
+ const inputRefs = useRef([]); // Store references to input fields
 
  const handleChange = (text, index) => {
   const newCode = [...code];
+
+  if (text.length > 1) {
+   return; // Prevent multiple characters from being entered
+  }
+
   newCode[index] = text;
   setCode(newCode);
+
+  // Move focus to next input if text is entered
+  if (text && index < 3) {
+   inputRefs.current[index + 1].focus();
+  }
+ };
+
+ const handleKeyPress = (e, index) => {
+  if (e.nativeEvent.key === 'Backspace' && index > 0 && !code[index]) {
+   inputRefs.current[index - 1].focus(); // Move focus back
+  }
  };
 
  const handleSubmit = async () => {
   const verificationCode = code.join('');
   console.log('Verification Code:', verificationCode);
 
-  // Retrieve the phone number from AsyncStorage
   const mobile = await AsyncStorage.getItem('phoneNumber');
   console.log('Phone Number:', mobile);
 
@@ -58,21 +74,17 @@ export default function LoginOtpScreen({ navigation }) {
     console.log('Response from API:', result);
 
     if (result.status === 'success') {
-     // Show success modal and navigate to Home after clicking OK
      setModalMessage('You have successfully verified your phone number!');
      setModalVisible(true);
     } else {
-     // OTP verification failed
      setModalMessage('OTP is incorrect. Please try again.');
      setModalVisible(true);
     }
    } catch (error) {
-    // Handle errors like network issues or unexpected response
     setModalMessage('An error occurred. Please try again.');
     setModalVisible(true);
    }
   } else {
-   // No token or mobile available
    setModalMessage('Token or mobile number not found. Please login again.');
    setModalVisible(true);
   }
@@ -81,21 +93,19 @@ export default function LoginOtpScreen({ navigation }) {
  const handleModalClose = () => {
   setModalVisible(false);
   if (modalMessage === 'You have successfully verified your phone number!') {
-   navigation.navigate('Home'); // Navigate to Home screen after closing the modal on success
+   navigation.navigate('Home');
   }
  };
 
  return (
   <KeyboardAvoidingView style={styles.container} behavior="padding">
-   {/* Header Section */}
    <View style={styles.header}>
     <Text style={styles.title}>Verify Mobile Number</Text>
     <Text style={styles.subtitle}>
-     Enter the 6-digit verification code sent to your phone.
+     Enter the 4-digit verification code sent to your phone.
     </Text>
    </View>
 
-   {/* Input Section */}
    <View style={styles.inputContainer}>
     <Text style={styles.label}>Enter Verification Code</Text>
 
@@ -103,51 +113,35 @@ export default function LoginOtpScreen({ navigation }) {
      {code.map((digit, index) => (
       <TextInput
        key={index}
+       ref={(el) => (inputRefs.current[index] = el)}
        style={styles.input}
        value={digit}
        onChangeText={(text) => handleChange(text, index)}
+       onKeyPress={(e) => handleKeyPress(e, index)}
        keyboardType="numeric"
        maxLength={1}
+       autoFocus={index === 0} // Auto-focus on the first input
       />
      ))}
     </View>
 
-    {/* Verify Button */}
-    <TouchableOpacity
-     style={styles.nextButton}
-     onPress={handleSubmit} // Show modal on verify
-    >
+    <TouchableOpacity style={styles.nextButton} onPress={handleSubmit}>
      <Text style={styles.nextButtonText}>Verify</Text>
     </TouchableOpacity>
 
-    {/* Back Button */}
-    <TouchableOpacity
-     style={styles.backButton}
-     onPress={() => navigation.goBack()} // Navigate back to the previous screen
-    >
+    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
      <Text style={styles.backButtonText}>Back</Text>
     </TouchableOpacity>
    </View>
 
-   {/* Verification Modal */}
-   <Modal
-    animationType="slide"
-    transparent={true}
-    visible={modalVisible}
-    onRequestClose={handleModalClose} // Close modal on back press
-   >
+   <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleModalClose}>
     <View style={styles.modalContainer}>
      <View style={styles.modalContent}>
       <Text style={styles.modalTitle}>
-       {modalMessage === 'You have successfully verified your phone number!'
-        ? 'Login Successful'
-        : 'Verification Failed'}
+       {modalMessage === 'You have successfully verified your phone number!' ? 'Login Successful' : 'Verification Failed'}
       </Text>
       <Text style={styles.modalMessage}>{modalMessage}</Text>
-      <TouchableOpacity
-       style={styles.modalButton}
-       onPress={handleModalClose} // Close modal and navigate to Home screen
-      >
+      <TouchableOpacity style={styles.modalButton} onPress={handleModalClose}>
        <Text style={styles.modalButtonText}>OK</Text>
       </TouchableOpacity>
      </View>
@@ -160,10 +154,10 @@ export default function LoginOtpScreen({ navigation }) {
 const styles = StyleSheet.create({
  container: {
   flex: 1,
-  backgroundColor: '#f5f5f5', // Light gray background
+  backgroundColor: '#f5f5f5',
  },
  header: {
-  backgroundColor: '#ff9600', // Dark green header background
+  backgroundColor: '#ff9600',
   borderBottomRightRadius: 40,
   padding: 25,
   paddingTop: 60,
@@ -195,7 +189,7 @@ const styles = StyleSheet.create({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '80%',
+  width: '75%',
   marginBottom: 30,
  },
  input: {
@@ -210,7 +204,7 @@ const styles = StyleSheet.create({
   borderRadius: 8,
  },
  nextButton: {
-  backgroundColor: '#ff9600', // Matching the dark green button color
+  backgroundColor: '#ff9600',
   paddingVertical: 16,
   borderRadius: 10,
   alignItems: 'center',
@@ -224,25 +218,24 @@ const styles = StyleSheet.create({
   fontWeight: 'bold',
  },
  backButton: {
-  backgroundColor: '#eaeaea', // Gray button to indicate "Back"
+  backgroundColor: '#eaeaea',
   paddingVertical: 16,
   borderRadius: 10,
   alignItems: 'center',
-  marginTop: 15, // Space between buttons
+  marginTop: 15,
   height: 50,
   width: 300,
  },
  backButtonText: {
-  color: '#666666', // Dark text for the back button
+  color: '#666666',
   fontSize: 18,
   fontWeight: 'bold',
  },
- // Modal Styles
  modalContainer: {
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
  },
  modalContent: {
   backgroundColor: '#fff',
@@ -262,7 +255,7 @@ const styles = StyleSheet.create({
   textAlign: 'center',
  },
  modalButton: {
-  backgroundColor: '#ff9600', // Button color
+  backgroundColor: '#ff9600',
   paddingVertical: 10,
   borderRadius: 10,
   width: '100%',

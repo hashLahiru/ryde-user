@@ -150,8 +150,8 @@ export default function RegisterScreen({ navigation }) {
 
 const styles = StyleSheet.create({
  container: { flex: 1, backgroundColor: '#fff' },
- header: { backgroundColor: '#ff9600', padding: 20, height: 180 },
- title: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+ header: { backgroundColor: '#ff9600', padding: 20, height: 180, borderBottomRightRadius: 50 },
+ title: { color: '#fff', fontSize: 24, fontWeight: 'bold', paddingTop: 25 },
  subtitle: { color: '#fff', fontSize: 14, marginTop: 10 },
  inputContainer: { flex: 1, padding: 20 },
  textInput: {
