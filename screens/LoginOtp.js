@@ -74,6 +74,7 @@ export default function LoginOtpScreen({ navigation }) {
     console.log('Response from API:', result);
 
     if (result.status === 'success') {
+     await AsyncStorage.setItem('login_token', result.login_token);
      setModalMessage('You have successfully verified your phone number!');
      setModalVisible(true);
     } else {
@@ -129,16 +130,26 @@ export default function LoginOtpScreen({ navigation }) {
      <Text style={styles.nextButtonText}>Verify</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+    <TouchableOpacity
+     style={styles.backButton}
+     onPress={() => navigation.goBack()}
+    >
      <Text style={styles.backButtonText}>Back</Text>
     </TouchableOpacity>
    </View>
 
-   <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={handleModalClose}>
+   <Modal
+    animationType="slide"
+    transparent={true}
+    visible={modalVisible}
+    onRequestClose={handleModalClose}
+   >
     <View style={styles.modalContainer}>
      <View style={styles.modalContent}>
       <Text style={styles.modalTitle}>
-       {modalMessage === 'You have successfully verified your phone number!' ? 'Login Successful' : 'Verification Failed'}
+       {modalMessage === 'You have successfully verified your phone number!'
+        ? 'Login Successful'
+        : 'Verification Failed'}
       </Text>
       <Text style={styles.modalMessage}>{modalMessage}</Text>
       <TouchableOpacity style={styles.modalButton} onPress={handleModalClose}>

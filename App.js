@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import 'react-native-get-random-values';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, ActivityIndicator } from 'react-native';
 
 // Splash and Onboarding Screens
 import SplashScreen from './screens/SplashScreen';
@@ -29,10 +33,34 @@ import DriverScreen from './screens/DriverScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
+ const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+ useEffect(() => {
+  const checkLogginState = async () => {
+   const token = await AsyncStorage.getItem('login_token');
+
+   if (token) {
+    setIsLoggedIn(true);
+   } else {
+    setIsLoggedIn(false);
+   }
+  };
+
+  checkLogginState();
+ }, []);
+
+ if (isLoggedIn === null) {
+  return (
+   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <ActivityIndicator size="large" color="#ff9600" />
+   </View>
+  );
+ }
+
  return (
   <NavigationContainer>
    <Stack.Navigator
-    initialRouteName="Splash" // Define the starting screen
+    initialRouteName={isLoggedIn ? 'Home' : 'Splash'} // Define the starting screen
     screenOptions={{
      headerShown: false, // Globally hide headers for all screens
     }}
