@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import 'react-native-get-random-values';
 
+import 'dotenv/config'; // Load environment variables from .env file
+import Constants from 'expo-constants';
+
+// Access environment variables
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const GOOGLE_DIRECTIONS_API_KEY = process.env.GOOGLE_DIRECTIONS_API_KEY;
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+
+console.log('Google API Key:', GOOGLE_API_KEY);
+console.log('Google Directions API Key:', GOOGLE_DIRECTIONS_API_KEY);
+console.log('Google Places API Key:', GOOGLE_PLACES_API_KEY);
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';

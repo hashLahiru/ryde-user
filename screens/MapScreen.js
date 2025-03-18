@@ -18,10 +18,12 @@ import { Ionicons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import * as Location from 'expo-location';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Constants from 'expo-constants';
 
-const GOOGLE_API_KEY = 'AIzaSyACSqBvJsdqmNey_aeN8FgvdYzeV88_vww';
-const GOOGLE_DIRECTIONS_API_KEY = 'AIzaSyAzjm5FmkJ1AI0MSde4vmoXeJY5lZXlAFY';
-const GOOGLE_PLACES_API_KEY = 'AIzaSyB2g8iWNkhS0omQ3c0yz70fYnBfrZ-IZj0';
+const GOOGLE_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
+const GOOGLE_DIRECTIONS_API_KEY =
+ Constants.expoConfig.extra.GOOGLE_DIRECTIONS_API_KEY;
+// const GOOGLE_PLACES_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
 
 export default function MapScreen({ navigation }) {
  const [pickup, setPickup] = useState(null);
