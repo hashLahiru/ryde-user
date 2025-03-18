@@ -1,28 +1,33 @@
 {
-  "expo": {
-    "name": "ryde",
-    "slug": "ryde",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+ "expo": {
+  "name": "ryde",
+  "slug": "ryde",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "light",
+  "newArchEnabled": true,
+  "splash": {
+   "image": "./assets/splash-icon.png",
+   "resizeMode": "contain",
+   "backgroundColor": "#ffffff"
+  },
+  "ios": {
+   "supportsTablet": true
+  },
+  "android": {
+   "adaptiveIcon": {
+    "foregroundImage": "./assets/adaptive-icon.png",
+    "backgroundColor": "#ffffff"
+   }
+  },
+  "web": {
+   "favicon": "./assets/favicon.png"
+  },
+  "extra": {
+   "GOOGLE_API_KEY": "your_google_api_key_here",
+   "GOOGLE_DIRECTIONS_API_KEY": "your_google_directions_api_key_here",
+   "GOOGLE_PLACES_API_KEY": "your_google_places_api_key_here"
   }
+ }
 }
