@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import 'react-native-get-random-values';
 
-import 'dotenv/config'; // Load environment variables from .env file
+// import 'dotenv/config'; // Load environment variables from .env file
 import Constants from 'expo-constants';
 
 // Access environment variables
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const GOOGLE_DIRECTIONS_API_KEY = process.env.GOOGLE_DIRECTIONS_API_KEY;
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const GOOGLE_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
+const GOOGLE_DIRECTIONS_API_KEY =
+ Constants.expoConfig.extra.GOOGLE_DIRECTIONS_API_KEY;
+const GOOGLE_PLACES_API_KEY = Constants.expoConfig.extra.GOOGLE_PLACES_API_KEY;
 
 console.log('Google API Key:', GOOGLE_API_KEY);
 console.log('Google Directions API Key:', GOOGLE_DIRECTIONS_API_KEY);
