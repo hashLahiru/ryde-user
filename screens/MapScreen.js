@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+// import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
 import * as Location from 'expo-location';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -23,7 +24,6 @@ import Constants from 'expo-constants';
 const GOOGLE_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
 const GOOGLE_DIRECTIONS_API_KEY =
     Constants.expoConfig.extra.GOOGLE_DIRECTIONS_API_KEY;
-// const GOOGLE_PLACES_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
 
 export default function MapScreen({ navigation }) {
     const [pickup, setPickup] = useState(null);
@@ -372,6 +372,29 @@ export default function MapScreen({ navigation }) {
                         onBackdropPress={() => setShowVehicleSelector(false)}
                     >
                         <View style={styles.modalContent}>
+                            {distance && duration && (
+                                <View style={styles.infoContainer}>
+                                    <Ionicons
+                                        name="time"
+                                        size={20}
+                                        color="#ff9600"
+                                    />
+                                    <Text style={styles.infoText}>
+                                        {duration.toFixed(2)} mins
+                                    </Text>
+
+                                    <MaterialCommunityIcons
+                                        name="map-marker-distance"
+                                        size={20}
+                                        color="#ff9600"
+                                        style={styles.iconSpacing}
+                                    />
+                                    <Text style={styles.infoText}>
+                                        {distance.toFixed(2)} km
+                                    </Text>
+                                </View>
+                            )}
+
                             <Text style={styles.modalTitle}>
                                 Select Your Ride
                             </Text>
@@ -503,4 +526,20 @@ const styles = StyleSheet.create({
         marginLeft: 130,
     },
     confirmText: { color: '#fff', fontWeight: 'bold' },
+    infoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center', // Adjust as needed
+        marginVertical: 10,
+    },
+
+    infoText: {
+        marginHorizontal: 5, // Adds spacing between text and icons
+        fontSize: 16,
+        color: '#333',
+    },
+
+    iconSpacing: {
+        marginLeft: 10, // Adjusts spacing between icons
+    },
 });
