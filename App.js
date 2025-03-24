@@ -33,6 +33,7 @@ import LoginOtpScreen from './screens/LoginOtp';
 // Main Screens
 import HomeScreen from './screens/HomeScreen';
 import MapScreen from './screens/MapScreen';
+import ConfirmRide from "./screens/ConfirmRide";
 
 // Additional Screens (Side Menu Items)
 import UserScreen from './screens/UserScreen';
@@ -41,6 +42,7 @@ import PaymentsScreen from './screens/PaymentsScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import SupportScreen from './screens/SupportScreen';
 import DriverScreen from './screens/DriverScreen';
+
 
 // Create Stack Navigator
 const Stack = createStackNavigator();
@@ -92,6 +94,7 @@ export default function App() {
     {/* Main App Screens */}
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="MapScreen" component={MapScreen} />
+    <Stack.Screen name="ConfirmRide" component={ConfirmRide} />
 
     {/* Side Menu Screens */}
     <Stack.Screen name="UserScreen" component={UserScreen} />

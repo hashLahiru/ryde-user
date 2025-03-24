@@ -184,6 +184,23 @@ export default function MapScreen({ navigation }) {
         });
     };
 
+    const handleConfirmRide = () => {
+      if (!pickupLocation || !dropLocation || !selectedVehicle) {
+          Alert.alert('Error', 'Please select all details before confirming.');
+          navigation.navigate('ConfirmRide');
+          return;
+      }
+  
+      navigation.navigate('ConfirmRide', {
+          pickupLocation,
+          dropLocation,
+          selectedVehicle,
+          duration: duration?.toFixed(2),
+          distance: distance?.toFixed(2),
+      });
+  };
+  
+
     // Sample Vehicles Data
     const vehicles = [
         {
@@ -434,13 +451,8 @@ export default function MapScreen({ navigation }) {
                             />
 
                             {/* Confirm Button */}
-                            <TouchableOpacity
-                                style={styles.confirmButton}
-                                onPress={() => setShowVehicleSelector(false)}
-                            >
-                                <Text style={styles.confirmText}>
-                                    Confirm Ride
-                                </Text>
+                            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmRide}>
+                                <Text style={styles.confirmText}>Confirm Ride</Text>
                             </TouchableOpacity>
                         </View>
                     </Modal>
@@ -449,7 +461,6 @@ export default function MapScreen({ navigation }) {
         </KeyboardAvoidingView>
     );
 }
-
 const styles = StyleSheet.create({
     container: { flex: 1 },
     backButton: { position: 'absolute', top: 50, left: 20, zIndex: 1 },
