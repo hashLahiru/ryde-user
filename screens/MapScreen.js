@@ -185,6 +185,25 @@ export default function MapScreen({ navigation }) {
         });
     };
 
+    const handleConfirmRide = () => {
+        if (!pickupLocation || !dropLocation || !selectedVehicle) {
+            Alert.alert(
+                'Error',
+                'Please select all details before confirming.'
+            );
+            navigation.navigate('ConfirmRide');
+            return;
+        }
+
+        navigation.navigate('ConfirmRide', {
+            pickupLocation,
+            dropLocation,
+            selectedVehicle,
+            duration: duration?.toFixed(2),
+            distance: distance?.toFixed(2),
+        });
+    };
+
     // Sample Vehicles Data
     const packages = [
         {
