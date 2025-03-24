@@ -20,6 +20,7 @@ import Modal from 'react-native-modal';
 import * as Location from 'expo-location';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GOOGLE_API_KEY = Constants.expoConfig.extra.GOOGLE_API_KEY;
 const GOOGLE_DIRECTIONS_API_KEY =
@@ -185,46 +186,30 @@ export default function MapScreen({ navigation }) {
     };
 
     // Sample Vehicles Data
-    const vehicles = [
-        {
-            id: '5',
-            name: 'Tuk',
-            seats: 2,
-            tripTime: '12 mins',
-            price: '$5',
-            image: require('../assets/tuk2.png'),
-        },
+    const packages = [
         {
             id: '1',
-            name: 'Sedan',
+            name: 'Blue',
             seats: 4,
             tripTime: '15 mins',
-            price: '$10',
+            price: `$${(duration * 10).toFixed(2)}`,
             image: require('../assets/sedan.png'),
         },
         {
             id: '2',
-            name: 'SUV',
+            name: 'Green',
             seats: 6,
             tripTime: '18 mins',
-            price: '$15',
+            price: `$${(duration * 15).toFixed(2)}`,
             image: require('../assets/suv.png'),
         },
         {
             id: '3',
-            name: 'Van',
+            name: 'Gold',
             seats: 8,
             tripTime: '20 mins',
-            price: '$20',
+            price: `$${(duration * 25).toFixed(2)}`,
             image: require('../assets/van.png'),
-        },
-        {
-            id: '4',
-            name: 'Mini',
-            seats: 3,
-            tripTime: '12 mins',
-            price: '$8',
-            image: require('../assets/mini.png'),
         },
     ];
 
@@ -234,6 +219,72 @@ export default function MapScreen({ navigation }) {
             return;
         }
         setShowVehicleSelector(true);
+    };
+
+    const confirmRide = async () => {
+        if (!selectedVehicle) {
+            Alert.alert('Error', 'Please select a vehicle to proceed!');
+            return;
+        }
+
+        const selectedVehicleData = packages.find(
+            (vehiclePackage) => vehiclePackage.id === selectedVehicle
+        );
+        if (!selectedVehicleData) {
+            Alert.alert('Error', 'Invalid package selected!');
+            return;
+        }
+
+        const login_token = await AsyncStorage.getItem('login_token');
+        if (!login_token) {
+            Alert.alert('Error', 'Login token not found. Please log in again.');
+            return;
+        }
+
+        const locationSearchApiData = {
+            function: 'SearchVehicle',
+            data: {
+                login_token: login_token,
+                start_lat: pickup.latitude.toString(), // Fix: Use toString()
+                start_long: pickup.longitude.toString(), // Fix: Use toString()
+                end_lat: drop.latitude.toString(), // Fix: Use toString()
+                end_long: drop.longitude.toString(), // Fix: Use toString()
+                vs_date_time: new Date().toISOString(),
+                vehicle_type: selectedVehicleData.id,
+            },
+        };
+
+        try {
+            const response = await fetch(
+                'http://ryde100.introps.com/App_apiv2/app_api',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Cookie: 'ci_session=2jb4rmpvr0jmlrh9s5noqvia1out7oj9; ci_session=g57pi09mlmfv9nen65c33tld4v7q5bdn',
+                    },
+                    body: JSON.stringify(locationSearchApiData),
+                }
+            );
+
+            const result = await response.json();
+            console.log(result);
+            if (result && result.status === 'success') {
+                Alert.alert('Success', 'Ride confirmed!');
+                setShowVehicleSelector(false);
+            } else {
+                Alert.alert(
+                    'Error',
+                    result.message || 'Failed to confirm ride.'
+                );
+            }
+        } catch (error) {
+            console.error('API Error:', error);
+            Alert.alert(
+                'Error',
+                'Something went wrong while confirming the ride.'
+            );
+        }
     };
 
     return (
@@ -402,7 +453,7 @@ export default function MapScreen({ navigation }) {
                             {/* Vehicle List */}
                             <FlatList
                                 horizontal
-                                data={vehicles}
+                                data={packages}
                                 keyExtractor={(item) => item.id}
                                 showsHorizontalScrollIndicator={false}
                                 renderItem={({ item }) => (
@@ -436,7 +487,7 @@ export default function MapScreen({ navigation }) {
                             {/* Confirm Button */}
                             <TouchableOpacity
                                 style={styles.confirmButton}
-                                onPress={() => setShowVehicleSelector(false)}
+                                onPress={confirmRide}
                             >
                                 <Text style={styles.confirmText}>
                                     Confirm Ride
@@ -449,7 +500,6 @@ export default function MapScreen({ navigation }) {
         </KeyboardAvoidingView>
     );
 }
-
 const styles = StyleSheet.create({
     container: { flex: 1 },
     backButton: { position: 'absolute', top: 50, left: 20, zIndex: 1 },
