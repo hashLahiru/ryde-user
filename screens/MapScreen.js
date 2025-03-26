@@ -37,6 +37,7 @@ export default function MapScreen({ navigation }) {
     const [distance, setDistance] = useState(null);
     const [duration, setDuration] = useState(null);
     const [routeCoordinates, setRouteCoordinates] = useState([]);
+    const [getVehicleSearchId, setVehicleSearchId] = useState(null);
 
     useEffect(() => {
         (async () => {
@@ -185,25 +186,6 @@ export default function MapScreen({ navigation }) {
         });
     };
 
-    const handleConfirmRide = () => {
-        if (!pickupLocation || !dropLocation || !selectedVehicle) {
-            Alert.alert(
-                'Error',
-                'Please select all details before confirming.'
-            );
-            navigation.navigate('ConfirmRide');
-            return;
-        }
-
-        navigation.navigate('ConfirmRide', {
-            pickupLocation,
-            dropLocation,
-            selectedVehicle,
-            duration: duration?.toFixed(2),
-            distance: distance?.toFixed(2),
-        });
-    };
-
     // Sample Vehicles Data
     const packages = [
         {
@@ -289,8 +271,8 @@ export default function MapScreen({ navigation }) {
             const result = await response.json();
             console.log(result);
             if (result && result.status === 'success') {
-                Alert.alert('Success', 'Ride confirmed!');
                 setShowVehicleSelector(false);
+                handleConfirmRide(result.search_id);
             } else {
                 Alert.alert(
                     'Error',
@@ -304,6 +286,29 @@ export default function MapScreen({ navigation }) {
                 'Something went wrong while confirming the ride.'
             );
         }
+    };
+
+    const handleConfirmRide = (searchId) => {
+        if (!pickupLocation || !dropLocation || !selectedVehicle) {
+            // Alert.alert(
+            //     'Error',
+            //     'Please select all details before confirming.'
+            // );
+
+            navigation.navigate('ConfirmRide');
+            return;
+        }
+
+        navigation.navigate('ConfirmRide', {
+            pickupLocation,
+            dropLocation,
+            selectedVehicle,
+            duration: duration?.toFixed(2),
+            distance: distance?.toFixed(2),
+            pickupCoordinates: pickup,
+            dropCoordinates: drop,
+            vehicleSearchId: searchId,
+        });
     };
 
     return (
