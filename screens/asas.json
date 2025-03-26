@@ -1,0 +1,47 @@
+{
+    "message": "Search saved successfully.",
+    "search_id": 29,
+    "status": "success",
+    "vehicles": [
+        {
+            "distance": "256.4973258211908",
+            "fk_vcl_id": "127",
+            "latitude": "7.29000000",
+            "longitude": "80.63380000",
+            "status": "active",
+            "updated_at": "2025-03-24 10:47:47",
+            "v_location_id": "227",
+            "vehicle_type_id": "2"
+        },
+        {
+            "distance": "282.96888917720133",
+            "fk_vcl_id": "126",
+            "latitude": "7.29082400",
+            "longitude": "80.63360000",
+            "status": "active",
+            "updated_at": "2025-03-24 10:47:47",
+            "v_location_id": "226",
+            "vehicle_type_id": "1"
+        },
+        {
+            "distance": "304.3098666213227",
+            "fk_vcl_id": "129",
+            "latitude": "7.29040000",
+            "longitude": "80.63410000",
+            "status": "active",
+            "updated_at": "2025-03-24 10:47:47",
+            "v_location_id": "229",
+            "vehicle_type_id": "2"
+        },
+        {
+            "distance": "336.57539604446924",
+            "fk_vcl_id": "128",
+            "latitude": "7.29110000",
+            "longitude": "80.63400000",
+            "status": "active",
+            "updated_at": "2025-03-24 10:47:47",
+            "v_location_id": "228",
+            "vehicle_type_id": "2"
+        }
+    ]
+}
