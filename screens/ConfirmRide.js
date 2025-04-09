@@ -71,23 +71,19 @@ export default function ConfirmRideScreen({ route, navigation }) {
     }, [pickupCoordinates, dropCoordinates]);
 
     useEffect(() => {
-        // Start the search process when component mounts
         startDriverSearch();
 
-        // Cleanup on unmount
         return () => {
             stopDriverSearch();
         };
     }, []);
 
     const startDriverSearch = () => {
-        // First request after 5 seconds
         setTimeout(() => {
             fetchFindDriver();
 
-            // Subsequent requests every 15 seconds
-            intervalRef.current = setInterval(fetchFindDriver, 15000);
-        }, 5000);
+            intervalRef.current = setInterval(fetchFindDriver, 30000);
+        }, 15000);
     };
 
     const stopDriverSearch = () => {
@@ -105,13 +101,14 @@ export default function ConfirmRideScreen({ route, navigation }) {
         }
 
         const login_token = await AsyncStorage.getItem('login_token');
-        const vehicleSearchId = 51; // Replace with dynamic search ID if needed
+        const vehicleSearchId = await AsyncStorage.getItem('vcl_search_id');
+        console.log('Vehicle Search ID : ', vehicleSearchId);
 
         const FindDriverData = {
             function: 'FindDriver',
             data: {
                 login_token: login_token,
-                vehicle_search_id: vehicleSearchId,
+                vehicle_search_id: vehicleSearchId.toString(),
             },
         };
 
@@ -139,7 +136,6 @@ export default function ConfirmRideScreen({ route, navigation }) {
                 setIsDriverFound(true);
                 stopDriverSearch();
 
-                // Auto-close the success modal after 5 seconds
                 setTimeout(() => {
                     setRiderFoundModal(false);
                 }, 5000);

@@ -241,6 +241,7 @@ export default function MapScreen({ navigation }) {
             Alert.alert('Error', 'Login token not found. Please log in again.');
             return;
         }
+        console.log(login_token);
 
         const locationSearchApiData = {
             function: 'SearchVehicle',
@@ -271,6 +272,10 @@ export default function MapScreen({ navigation }) {
             const result = await response.json();
             console.log(result);
             if (result && result.status === 'success') {
+                await AsyncStorage.setItem(
+                    'vcl_search_id',
+                    result.search_id.toString()
+                );
                 setShowVehicleSelector(false);
                 handleConfirmRide(result.search_id);
             } else {
