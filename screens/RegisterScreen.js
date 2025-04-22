@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
     Modal,
+    FlatList,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -20,13 +21,35 @@ export default function RegisterScreen({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
+    const [showCountryPicker, setShowCountryPicker] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState({
+        code: 'LK',
+        name: 'Sri Lanka',
+        flag: '🇱🇰',
+        dialCode: '+94',
+    });
+
+    const countries = [
+        { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰', dialCode: '+94' },
+        { code: 'PK', name: 'Pakistan', flag: '🇵🇰', dialCode: '+92' },
+        { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
+        { code: 'IN', name: 'India', flag: '🇮🇳', dialCode: '+91' },
+        { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44' },
+        {
+            code: 'AE',
+            name: 'United Arab Emirates',
+            flag: '🇦🇪',
+            dialCode: '+971',
+        },
+    ];
 
     const handleRegister = async () => {
+        const fullPhoneNumber = selectedCountry.dialCode + phoneNumber;
         try {
             const requestBody = {
                 function: 'CreateUser',
                 data: {
-                    mobile: phoneNumber,
+                    mobile: fullPhoneNumber,
                     email: email,
                     password: password,
                     firstname: firstName,
@@ -36,7 +59,7 @@ export default function RegisterScreen({ navigation }) {
             };
 
             const response = await fetch(
-                'http://ryde100.introps.com/app_apiv2/app_api',
+                'http://ryde100.introps.com/User/app_api',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -98,13 +121,29 @@ export default function RegisterScreen({ navigation }) {
                     onChangeText={setEmail}
                     keyboardType="email-address"
                 />
-                <TextInput
-                    style={styles.textInput}
-                    placeholder="Phone Number"
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    keyboardType="phone-pad"
-                />
+                <View style={styles.phoneInputContainer}>
+                    {/* Country Code Selector */}
+                    <TouchableOpacity
+                        style={styles.countryCodeButton}
+                        onPress={() => setShowCountryPicker(true)}
+                    >
+                        <Text style={styles.countryFlag}>
+                            {selectedCountry.flag}
+                        </Text>
+                        <Text style={styles.countryCodeText}>
+                            {selectedCountry.dialCode}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/* Phone Number Input */}
+                    <TextInput
+                        style={styles.phoneInput}
+                        placeholder="Phone Number"
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                        keyboardType="phone-pad"
+                    />
+                </View>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Address"
@@ -154,6 +193,52 @@ export default function RegisterScreen({ navigation }) {
                             <Text style={styles.modalButtonText}>OK</Text>
                         </TouchableOpacity>
                     </View>
+                </View>
+            </Modal>
+
+            <Modal
+                visible={showCountryPicker}
+                transparent={true}
+                animationType="slide"
+            >
+                <View style={styles.countryPickerModal}>
+                    <View style={styles.countryPickerHeader}>
+                        <Text style={styles.countryPickerTitle}>
+                            Select Country
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => setShowCountryPicker(false)}
+                        >
+                            <Text style={styles.countryPickerDone}>Done</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <FlatList
+                        data={countries}
+                        keyExtractor={(item) => item.code}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                style={[
+                                    styles.countryItem,
+                                    selectedCountry.code === item.code &&
+                                        styles.selectedCountryItem,
+                                ]}
+                                onPress={() => {
+                                    setSelectedCountry(item);
+                                    setShowCountryPicker(false);
+                                }}
+                            >
+                                <Text style={styles.countryItemFlag}>
+                                    {item.flag}
+                                </Text>
+                                <Text style={styles.countryItemName}>
+                                    {item.name}
+                                </Text>
+                                <Text style={styles.countryItemCode}>
+                                    {item.dialCode}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    ></FlatList>
                 </View>
             </Modal>
         </KeyboardAvoidingView>
@@ -217,4 +302,85 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+
+    countryPickerModal: {
+        flex: 1,
+        backgroundColor: '#fff',
+        marginTop: 100,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    countryPickerHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    countryPickerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    countryPickerDone: {
+        color: '#FFC107',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    countryItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f5f5f5',
+    },
+    selectedCountryItem: {
+        backgroundColor: '#FFF9E6',
+    },
+    countryItemFlag: {
+        fontSize: 20,
+        width: 30,
+    },
+    countryItemName: {
+        flex: 1,
+        fontSize: 16,
+    },
+    countryItemCode: {
+        fontSize: 16,
+        color: '#666',
+    },
+    phoneInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    countryCodeButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 50,
+        paddingHorizontal: 10,
+        backgroundColor: '#f9f9f9',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
+        marginRight: -1, // Remove double border
+    },
+    countryFlag: {
+        fontSize: 20,
+        marginRight: 5,
+    },
+    countryCodeText: {
+        fontSize: 16,
+    },
+    phoneInput: {
+        flex: 1,
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderTopRightRadius: 10,
+        borderBottomRightRadius: 10,
+        paddingHorizontal: 15,
+        backgroundColor: '#f9f9f9',
+    },
 });
