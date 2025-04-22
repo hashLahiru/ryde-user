@@ -36,6 +36,7 @@ export default function ConfirmRideScreen({ route, navigation }) {
     const [region, setRegion] = useState(null);
     const [routeCoordinates, setRouteCoordinates] = useState([]);
     const [isDriverFound, setIsDriverFound] = useState(false);
+    const [isRydeSuccess, setIsRydeSuccess] = useState(true);
 
     const intervalRef = useRef(null);
 
@@ -114,7 +115,7 @@ export default function ConfirmRideScreen({ route, navigation }) {
 
         try {
             const response = await fetch(
-                'http://ryde100.introps.com/App_apiv2/app_api',
+                'http://ryde100.introps.com/UserRide/app_api',
                 {
                     method: 'POST',
                     headers: {
@@ -132,7 +133,7 @@ export default function ConfirmRideScreen({ route, navigation }) {
                 setModalVisible(true);
             } else if (result?.status === 'found') {
                 setModalMessage('Ryder found. Please wait...');
-                setRiderFoundModal(true);
+                setR(true);
                 setIsDriverFound(true);
                 stopDriverSearch();
 
@@ -143,6 +144,7 @@ export default function ConfirmRideScreen({ route, navigation }) {
                 setModalMessage('No Ryders. Please try again later.');
                 setModalVisible(true);
                 setIsDriverFound(true);
+                setIsRydeSuccess(false);
                 stopDriverSearch();
             }
         } catch (error) {
@@ -211,13 +213,14 @@ export default function ConfirmRideScreen({ route, navigation }) {
                             <Marker
                                 coordinate={pickupCoordinates}
                                 title="Pickup"
+                                pinColor="#ff9600"
                             />
                         )}
                         {dropCoordinates && (
                             <Marker
                                 coordinate={dropCoordinates}
                                 title="Drop"
-                                pinColor="blue"
+                                pinColor="#1f1f1f"
                             />
                         )}
 
@@ -228,7 +231,7 @@ export default function ConfirmRideScreen({ route, navigation }) {
                                 destination={dropCoordinates}
                                 apikey={GOOGLE_DIRECTIONS_API_KEY}
                                 strokeWidth={5}
-                                strokeColor="blue"
+                                strokeColor="#1f1f1f"
                                 onError={(errorMessage) =>
                                     console.error(
                                         'MapViewDirections Error:',
@@ -299,6 +302,16 @@ export default function ConfirmRideScreen({ route, navigation }) {
                         >
                             {modelMessage}
                         </Animated.Text>
+                        <TouchableOpacity
+                            visible={isRydeSuccess}
+                            style={styles.modalButton}
+                            onPress={() => {
+                                navigation.navigate('Home');
+                                setModalVisible(false);
+                            }}
+                        >
+                            <Text style={styles.modalButtonText}>Back</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -386,4 +399,14 @@ const styles = StyleSheet.create({
         color: '#555',
         marginTop: 10,
     },
+    modalButton: {
+        backgroundColor: '#ff9600',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginTop: 20,
+        borderRadius: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
+    modalButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });

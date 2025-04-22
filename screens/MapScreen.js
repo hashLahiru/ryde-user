@@ -38,6 +38,7 @@ export default function MapScreen({ navigation }) {
     const [duration, setDuration] = useState(null);
     const [routeCoordinates, setRouteCoordinates] = useState([]);
     const [getVehicleSearchId, setVehicleSearchId] = useState(null);
+    const [currentAddress, setCurrentAddress] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -62,6 +63,13 @@ export default function MapScreen({ navigation }) {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
             });
+
+            const address = await Location.reverseGeocodeAsync(initialLocation);
+            if (address.length > 0) {
+                const fullAddress = `${address[0].name}, ${address[0].street}, ${address[0].city}`;
+                setPickupLocation(fullAddress);
+                setCurrentAddress(fullAddress);
+            }
         })();
     }, []);
 
@@ -144,7 +152,11 @@ export default function MapScreen({ navigation }) {
                 longitude: location.lng,
             };
             setPickup(newPickup);
-            updateRegion(newPickup, drop);
+            setRegion({
+                ...newPickup,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            });
             fetchRoute(newPickup, drop);
         } else {
             Alert.alert('Error', 'Location data not available');
@@ -258,7 +270,7 @@ export default function MapScreen({ navigation }) {
 
         try {
             const response = await fetch(
-                'http://ryde100.introps.com/App_apiv2/app_api',
+                'http://ryde100.introps.com/UserRide/app_api',
                 {
                     method: 'POST',
                     headers: {
@@ -327,7 +339,7 @@ export default function MapScreen({ navigation }) {
                         style={styles.backButton}
                         onPress={() => navigation.goBack()}
                     >
-                        <Ionicons name="arrow-back" size={28} color="#000" />
+                        <Ionicons name="arrow-back" size={26} color="#fff" />
                     </TouchableOpacity>
 
                     {/* Map View */}
@@ -347,13 +359,14 @@ export default function MapScreen({ navigation }) {
                                     <Marker
                                         coordinate={pickup}
                                         title="Pickup"
+                                        pinColor="#ff9600"
                                     />
                                 )}
                                 {drop && (
                                     <Marker
                                         coordinate={drop}
                                         title="Drop"
-                                        pinColor="blue"
+                                        pinColor="#1f1f1f"
                                     />
                                 )}
 
@@ -364,7 +377,7 @@ export default function MapScreen({ navigation }) {
                                         destination={drop}
                                         apikey={GOOGLE_DIRECTIONS_API_KEY}
                                         strokeWidth={5}
-                                        strokeColor="blue"
+                                        strokeColor="#1f1f1f"
                                         onReady={(result) => {
                                             console.log(
                                                 'Distance:',
@@ -407,23 +420,44 @@ export default function MapScreen({ navigation }) {
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Pick Up</Text>
                             <GooglePlacesAutocomplete
-                                placeholder="Your Location"
-                                onPress={handlePickupLocationSelect}
+                                placeholder="Pickup Location"
+                                onPress={(data, details = null) => {
+                                    const lat = details.geometry.location.lat;
+                                    const lng = details.geometry.location.lng;
+                                    const location = {
+                                        latitude: lat,
+                                        longitude: lng,
+                                    };
+                                    setPickup(location);
+                                    setPickupLocation(data.description);
+                                    updateRegion(location, drop); // Update map region
+                                    fetchRoute(location, drop);
+                                }}
+                                fetchDetails={true}
                                 query={{
                                     key: GOOGLE_API_KEY,
                                     language: 'en',
+                                    components: 'country:lk',
+                                }}
+                                textInputProps={{
+                                    value: pickupLocation,
+                                    onChangeText: setPickupLocation,
+                                    placeholderTextColor: '#999',
                                 }}
                                 styles={{
                                     textInput: styles.input,
                                 }}
+                                enablePoweredByContainer={false}
                             />
+
                             <Text style={styles.label}>Drop</Text>
                             <GooglePlacesAutocomplete
-                                placeholder="Where are you going"
+                                placeholder="Drop Location"
                                 onPress={handleDropLocationSelect}
                                 query={{
                                     key: GOOGLE_API_KEY,
                                     language: 'en',
+                                    components: 'country:lk',
                                 }}
                                 styles={{
                                     textInput: styles.input,
@@ -531,7 +565,15 @@ export default function MapScreen({ navigation }) {
 }
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    backButton: { position: 'absolute', top: 50, left: 20, zIndex: 1 },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        borderRadius: 30,
+        padding: 10,
+        zIndex: 10,
+    },
     mapContainer: { flex: 2 },
     map: { width: '100%', height: '100%' },
     bottomSheet: {

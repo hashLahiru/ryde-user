@@ -11,7 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function VerifyMobileScreen({ navigation }) {
-    const [code, setCode] = useState(['', '', '', '', '', '']); // Store OTP digits
+    const [code, setCode] = useState(['', '', '', '']); // Store OTP digits
     const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
     const [modalMessage, setModalMessage] = useState(''); // Dynamic modal message
     const inputsRef = useRef([]); // Ref for input fields
@@ -24,7 +24,7 @@ export default function VerifyMobileScreen({ navigation }) {
         setCode(newCode);
 
         // Move to next input automatically
-        if (text && index < code.length - 1) {
+        if (text && index < 3) {
             inputsRef.current[index + 1]?.focus();
         }
     };
@@ -59,7 +59,7 @@ export default function VerifyMobileScreen({ navigation }) {
                 };
 
                 const response = await fetch(
-                    'http://ryde100.introps.com/App_apiv2/app_api',
+                    'http://ryde100.introps.com/User/app_api',
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
