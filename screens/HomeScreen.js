@@ -29,16 +29,13 @@ const HomeScreen = ({ navigation }) => {
     //     }
     // };
 
-    // Toggle the visibility of the side menu
     const toggleSideMenu = () => {
         setSideMenuVisible(!sideMenuVisible);
     };
 
-    // Handle navigation for each menu item
     const handleMenuItemClick = (item) => {
-        setSideMenuVisible(false); // Close the side menu after selection
+        setSideMenuVisible(false);
 
-        // Navigate to the corresponding screen
         switch (item) {
             case 'User':
                 navigation.navigate('UserScreen');
